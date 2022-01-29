@@ -4,7 +4,9 @@ go 1.16
 
 require (
 	cloud.google.com/go v0.99.0 // indirect
+	github.com/GoogleCloudPlatform/functions-framework-go v1.5.2 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/cloudevents/sdk-go v1.0.0 // indirect
 	github.com/cncf/xds/go v0.0.0-20211130200136-a8f946100490 // indirect
 	github.com/envoyproxy/go-control-plane v0.10.1 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.6.2 // indirect
