@@ -10,7 +10,7 @@ import (
 
 type CacheBackend interface {
 	PutArtifact(hash string, reader io.Reader) error
-	FetchArtifact(hash string) error
+	FetchArtifact(hash string) (io.Reader, error)
 }
 
 type cacheBackend struct {
@@ -46,6 +46,16 @@ func (backend *cacheBackend) PutArtifact(hash string, reader io.Reader) error {
 	return nil
 }
 
-func (backend *cacheBackend) FetchArtifact(hash string) error {
-	return nil
+func (backend *cacheBackend) FetchArtifact(hash string) (io.Reader, error) {
+	readCtx, cancelRead := context.WithCancel(context.TODO())
+	defer cancelRead()
+
+	r, err := backend.bucket.NewReader(readCtx, hash, nil)
+	defer r.Close()
+	if err != nil {
+		cancelRead()
+		return nil, err
+	}
+
+	return r, nil
 }
