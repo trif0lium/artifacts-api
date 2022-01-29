@@ -2,13 +2,14 @@ package backend
 
 import (
 	"context"
+	"io"
 	"strings"
 
 	"gocloud.dev/blob"
 )
 
 type CacheBackend interface {
-	PutArtifact(hash string) error
+	PutArtifact(hash string, reader io.Reader) error
 	FetchArtifact(hash string) error
 }
 
@@ -26,12 +27,17 @@ func NewCacheBackend(bucket *blob.Bucket, bucketFolder string) CacheBackend {
 	return &cacheBackend{bucket: prefixedBucket}
 }
 
-func (backend *cacheBackend) PutArtifact(hash string) error {
+func (backend *cacheBackend) PutArtifact(hash string, reader io.Reader) error {
 	writeCtx, cancelWrite := context.WithCancel(context.TODO())
 	defer cancelWrite()
 
 	w, err := backend.bucket.NewWriter(writeCtx, hash, nil)
 	defer w.Close()
+
+	if _, err := io.Copy(w, reader); err != nil {
+		cancelWrite()
+		return err
+	}
 
 	if err != nil {
 		return err
