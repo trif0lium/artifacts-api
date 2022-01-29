@@ -1,6 +1,10 @@
 package backend
 
-import "gocloud.dev/blob"
+import (
+	"strings"
+
+	"gocloud.dev/blob"
+)
 
 type CacheBackend interface {
 	PutArtifact(hash string) error
@@ -12,7 +16,12 @@ type cacheBackend struct {
 }
 
 func NewCacheBackend(bucket *blob.Bucket, bucketFolder string) CacheBackend {
-	prefixedBucket := blob.PrefixedBucket(bucket, bucketFolder)
+	prefix := bucketFolder
+	if !strings.HasSuffix(prefix, "/") {
+		prefix = prefix + "/"
+	}
+
+	prefixedBucket := blob.PrefixedBucket(bucket, prefix)
 	return &cacheBackend{bucket: prefixedBucket}
 }
 
