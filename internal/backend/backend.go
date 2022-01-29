@@ -1,20 +1,25 @@
 package backend
 
+import "gocloud.dev/blob"
+
 type CacheBackend interface {
-	PutArtifact(hash string, bucketFolder string) error
-	FetchArtifact(hash string, bucketFolder string) error
+	PutArtifact(hash string) error
+	FetchArtifact(hash string) error
 }
 
-type cacheBackend struct{}
-
-func NewCacheBackend() CacheBackend {
-	return &cacheBackend{}
+type cacheBackend struct {
+	bucket *blob.Bucket
 }
 
-func (backend *cacheBackend) PutArtifact(hash string, bucketFolder string) error {
+func NewCacheBackend(bucket *blob.Bucket, bucketFolder string) CacheBackend {
+	prefixedBucket := blob.PrefixedBucket(bucket, bucketFolder)
+	return &cacheBackend{bucket: prefixedBucket}
+}
+
+func (backend *cacheBackend) PutArtifact(hash string) error {
 	return nil
 }
 
-func (backend *cacheBackend) FetchArtifact(hash string, bucketFolder string) error {
+func (backend *cacheBackend) FetchArtifact(hash string) error {
 	return nil
 }
