@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"context"
 	"strings"
 
 	"gocloud.dev/blob"
@@ -26,6 +27,16 @@ func NewCacheBackend(bucket *blob.Bucket, bucketFolder string) CacheBackend {
 }
 
 func (backend *cacheBackend) PutArtifact(hash string) error {
+	writeCtx, cancelWrite := context.WithCancel(context.TODO())
+	defer cancelWrite()
+
+	w, err := backend.bucket.NewWriter(writeCtx, hash, nil)
+	defer w.Close()
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
